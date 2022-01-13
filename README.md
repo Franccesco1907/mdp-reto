@@ -18,5 +18,4 @@ Para recibir información
 
 - node src/index.js mdplinks --tags empresa
 
-
-/img/prueba.png
+<img src="/img/prueba.png" width="600" height="150" />
