@@ -18,4 +18,6 @@ Para recibir información
 
 - node src/index.js mdplinks --tags empresa
 
-<img src="/img/prueba.png" width="600" height="150" />
+La salida sería:
+
+<img src="/img/prueba.png" width="1642" height="681" />
