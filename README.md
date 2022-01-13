@@ -1,4 +1,8 @@
 # mdp-reto
+Para este reto usé una base de datos clave valor llamada Redis.
+En ese sentido, ejecuté redis en docker para activar la base de datos.
+
+Una vez instalado docker y todas las dependencias, se podrá ejecutar los comandos que se encuentran a continuación.
 
 EJEMPLOS DE COMANDOS:
 
