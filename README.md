@@ -1,23 +1,15 @@
 # mdp-reto
-Para este reto usé una base de datos clave valor llamada Redis.
-En ese sentido, ejecuté redis en docker para activar la base de datos.
 
-Una vez instalado docker y todas las dependencias, se podrá ejecutar los comandos que se encuentran a continuación.
+CLI para guardar enlaces en Redis y buscarlos por etiqueta.
 
-EJEMPLOS DE COMANDOS:
+1. Instalar dependencias: `npm ci`.
+2. Iniciar Redis en `127.0.0.1:6379`; por ejemplo, `docker run --rm -p 6379:6379 redis` (sin volumen, los datos se pierden al eliminar el contenedor).
+3. Guardar y consultar:
 
-Para enviar información:
+```sh
+node src/index.js mdplinks "https://www.mdp.com.pe" --tags empresa,programacion --title "MDP"
+node src/index.js mdplinks --tags empresa
+```
 
-- node src/index.js mdplinks "https://www.mdp.com.pe" --tags empresa,programacion,software --title "Página web de MDP"
-- node src/index.js mdplinks "https://www.facebook.com/" --tags empresa,lider,entretenimiento --title "Facebook"
-- node src/index.js mdplinks "https://twitter.com/" --tags empresa,noticias,entretenimiento --title "Twitter"
-- node src/index.js mdplinks "https://www.youtube.com/watch?v=adMC9gFeITc" --tags empresa,videos,entretenimiento --title "Youtube"
-- node src/index.js mdplinks "https://translate.google.com/" --tags empresa,traduccion,aprendizaje --title "Traductor"
-
-Para recibir información
-
-- node src/index.js mdplinks --tags empresa
-
-La salida sería:
-
-<img src="/img/prueba.png" width="1642" height="681" />
+Las etiquetas deben ser alfabéticas, separadas por comas. El título de la página tiene prioridad; `--title` se usa si está vacío. La consulta actual mantiene el proceso abierto; detener con Ctrl+C.
+Pruebas de regresión sin Redis ni red: `npm test`.
