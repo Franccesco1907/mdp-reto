@@ -27,9 +27,15 @@ if (command != "mdplinks") {
   if (link_or_tag != "--tags") {
     let data = addLink().then((res) => {
       data = res;
-      client.set(hash(data.link), JSON.stringify(data)); // se tiene que convertir a cadena para enviarlo a la BD de Redis
-      console.log(colors.blue("Los datos fueron añadidos correctamente!"));
-      exit(0); // Salida exitosa
+      client.set(hash(data.link), JSON.stringify(data), (err) => {
+        if (err) {
+          console.error(err);
+          exit(1);
+          return;
+        }
+        console.log(colors.blue("Los datos fueron añadidos correctamente!"));
+        exit(0);
+      });
     });
   } else {
     let links = viewLinks();
@@ -108,36 +114,26 @@ async function getLinks() {
   return links;
 } 
 
-function getLinksPromise() {
-  return new Promise(async (resolve, reject) => {
-      let keys_array = await getKeys();
-      let links = await getArrayLinks(keys_array);
-      resolve(links);
-  });
+async function getLinksPromise() {
+  const keys_array = await getKeys();
+  return getArrayLinks(keys_array);
 }
 
-function getArrayLinks(keys_array) {
-  return new Promise((resolve, reject) => {
-    let etiqueta = process.argv[4];
-    let links = [];
-    keys_array.forEach( async (element) => {
-      let value = await getValue(element);
-  
-      let tagsPerValue = Object.values(JSON.parse(value).tags);
-      
-      if (tagsPerValue.indexOf(etiqueta) != -1) {
-        links.push(element);
-      }
-    });
-    setTimeout(function(){
-      resolve(links);
-    }, 100);
-  });
+async function getArrayLinks(keys_array) {
+  const etiqueta = process.argv[4];
+  const matches = await Promise.all(keys_array.map(async (element) => {
+    const value = await getValue(element);
+    if (!value) return null;
+    const tags = Object.values(JSON.parse(value).tags);
+    return tags.includes(etiqueta) ? element : null;
+  }));
+  return matches.filter(element => element !== null);
 }
 
 function getKeysPromise() {
   return new Promise((resolve, reject) => {
-      let reply = client.keys('*', (err, keys) => {
+      client.keys('*', (err, keys) => {
+        if (err) return reject(err);
         resolve(keys);
       });
   });
@@ -150,7 +146,8 @@ async function getKeys() {
 
 function getValuePromise(element) {
   return new Promise((resolve, reject) => {
-      reply = client.get(element, (err, value) => {
+      client.get(element, (err, value) => {
+        if (err) return reject(err);
         resolve(value);
       });
   })
